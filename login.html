@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:340px; margin:4rem auto 0;">
+  <h1 class="fr-font" style="text-align:center; font-size:24px;">{{ association_nom }}</h1>
+  <p class="muted" style="text-align:center; margin-bottom:1.5rem;">Gestion buvette</p>
+  <form method="post" class="card" style="padding:1.25rem;">
+    <label style="font-size:13px; font-weight:600; color:#5a6b62; display:block; margin-bottom:6px;">Mot de passe</label>
+    <input type="password" name="password" autofocus style="margin-bottom:12px;">
+    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Se connecter</button>
+  </form>
+</div>
+{% endblock %}

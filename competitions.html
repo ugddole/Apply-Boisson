@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="fr-font">Compétitions</h1>
+<p class="muted">Choisissez une compétition pour gérer ses quantités, sa commande et ses affiches.</p>
+
+<div class="card" style="max-width:640px; margin-bottom:1.5rem;">
+  {% for c in competitions %}
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid #E9E5D8;">
+    <div>
+      <a href="{{ url_for('competition_detail', comp_id=c['id']) }}" style="font-weight:500; text-decoration:none; color:#22302C;">{{ c['nom'] }}</a>
+      {% if c['date'] %}<div class="muted" style="font-size:12px;">{{ c['date'] }}</div>{% endif %}
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; font-size:12px;">
+      <a href="{{ url_for('competition_detail', comp_id=c['id']) }}">Quantités</a>
+      <a href="{{ url_for('commande', comp_id=c['id']) }}">Commande</a>
+      <a href="{{ url_for('commande_snacks', comp_id=c['id']) }}">Commande snacks</a>
+      <a href="{{ url_for('affiche', comp_id=c['id']) }}">Affiche</a>
+      <a href="{{ url_for('affiche_snacks', comp_id=c['id']) }}">Affiche snacks</a>
+      <form method="post" action="{{ url_for('competitions_supprimer', comp_id=c['id']) }}" onsubmit="return confirm('Supprimer cette compétition ?');">
+        <button type="submit" class="btn-danger">Supprimer</button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <p class="muted" style="padding:1rem;">Aucune compétition créée.</p>
+  {% endfor %}
+</div>
+
+<form method="post" action="{{ url_for('competitions_creer') }}" class="card" style="padding:1rem; max-width:360px;">
+  <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Nouvelle compétition</p>
+  <input type="text" name="nom" placeholder="Nom de la compétition" required style="margin-bottom:8px;">
+  <input type="date" name="date" style="margin-bottom:10px;">
+  <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Créer</button>
+</form>
+{% endblock %}

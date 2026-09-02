@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+buvette.db
+static/uploads/
+.env
