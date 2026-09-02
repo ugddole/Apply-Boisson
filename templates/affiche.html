@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="no-print" style="display:flex; gap:8px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;">
+  <a href="{{ url_for('competitions') }}" class="btn-ghost">← Compétitions</a>
+  <a href="{{ url_for('competition_detail', comp_id=competition['id']) }}" class="btn-ghost">Quantités</a>
+  <a href="{{ url_for('commande', comp_id=competition['id']) }}" class="btn-ghost">Commande</a>
+
+  <form method="post" action="{{ url_for('affiche_fond', comp_id=competition['id']) }}" enctype="multipart/form-data" style="display:inline-flex; gap:6px; align-items:center; margin-left:auto;">
+    <input type="file" name="fond" accept="image/png,image/jpeg,image/webp" style="width:auto;">
+    <button type="submit" class="btn btn-ghost">Changer le fond</button>
+  </form>
+  <button onclick="window.print()" class="btn btn-primary">Imprimer</button>
+</div>
+
+<h1 class="fr-font">Affiche boissons — {{ competition['nom'] }}</h1>
+
+{% if not boissons %}
+  <p class="muted">Aucune boisson sélectionnée pour cette compétition (voir la page Quantités).</p>
+{% else %}
+<div class="poster" style="{% if fond_filename %}background-image:url('{{ url_for('static', filename='uploads/' + fond_filename) }}');{% endif %}">
+  <div class="poster-overlay" style="{% if fond_filename %}background:rgba(20,22,20,0.45);{% endif %}"></div>
+  <div style="position:relative; z-index:1;">
+    <h2 class="poster-title fr-font">{{ competition['titre_affiche'] or competition['nom'] }}</h2>
+    {% for b in boissons %}
+    <div class="poster-row">
+      <span class="poster-name fr-font">{{ b['nom'] }}{% if b['servi'] %}<span class="sub"> · {{ b['servi'] }}</span>{% endif %}</span>
+      <span class="poster-price fr-font">{{ "%.2f"|format(b['prix_vente']) }} €</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="fr-font">Snacks</h1>
+<p class="muted">La liste de référence des snacks, avec leurs composants (nomenclature).</p>
+
+<form method="get" style="margin-bottom:1.25rem; max-width:340px;">
+  <select name="competition_id" onchange="this.form.submit()">
+    <option value="">Tous les snacks</option>
+    {% for c in competitions %}
+    <option value="{{ c['id'] }}" {{ 'selected' if selected_competition_id == c['id'] else '' }}>{{ c['nom'] }}{% if c['date'] %} — {{ c['date'] }}{% endif %}</option>
+    {% endfor %}
+  </select>
+</form>
+
+{% for s in snacks %}
+<div class="card" style="margin-bottom:1rem;">
+  <form method="post" action="{{ url_for('snacks_modifier', snack_id=s['id']) }}" class="grid-snack-row" style="padding:12px 16px;">
+    <input type="hidden" name="competition_id" value="{{ selected_competition_id or '' }}">
+    <input type="text" name="nom" value="{{ s['nom'] }}" list="dl-snack">
+    <input type="text" name="servi" value="{{ s['servi'] or '' }}" list="dl-snack-servi">
+    <input type="number" step="0.1" name="prix_vente" value="{{ s['prix_vente'] }}">
+    <input type="text" name="commentaire" value="{{ s['commentaire'] or '' }}" placeholder="Commentaire">
+    <span style="white-space:nowrap;">
+      <button type="submit" class="icon-btn" title="Enregistrer">✓</button>
+    </span>
+  </form>
+  <div class="row-actions" style="padding:0 16px 12px;">
+    <form method="post" action="{{ url_for('snacks_deplacer', snack_id=s['id'], direction='up') }}">
+      <input type="hidden" name="competition_id" value="{{ selected_competition_id or '' }}">
+      <button type="submit" class="icon-btn" title="Monter">↑ Monter</button>
+    </form>
+    <form method="post" action="{{ url_for('snacks_deplacer', snack_id=s['id'], direction='down') }}">
+      <input type="hidden" name="competition_id" value="{{ selected_competition_id or '' }}">
+      <button type="submit" class="icon-btn" title="Descendre">↓ Descendre</button>
+    </form>
+    <form method="post" action="{{ url_for('snacks_supprimer', snack_id=s['id']) }}" onsubmit="return confirm('Supprimer ce snack et ses composants ?');"><button type="submit" class="btn-danger">Supprimer le snack</button></form>
+  </div>
+  <div style="background:#FAF8F2; padding:14px 20px;">
+    <p style="font-size:12px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Composants de « {{ s['nom'] }} »</p>
+    <div class="table-scroll">
+    <table style="margin-bottom:10px;">
+      <thead><tr><th>Composant</th><th>Qté / unité vendue</th><th>Unité</th><th>Qté / pack fournisseur</th><th>Fournisseur</th><th></th></tr></thead>
+      <tbody>
+        {% for c in composants_by_snack.get(s['id'], []) %}
+        <tr>
+          <form method="post" action="{{ url_for('composants_modifier', composant_id=c['id']) }}" style="display:contents;">
+          <td><input type="text" name="nom" value="{{ c['nom'] }}" list="dl-composant-nom"></td>
+          <td><input type="number" step="0.01" name="quantite" value="{{ c['quantite'] }}" style="width:80px;"></td>
+          <td><input type="text" name="unite" value="{{ c['unite'] or '' }}" list="dl-composant-unite" style="width:90px;"></td>
+          <td><input type="number" name="qt_par_pack" value="{{ c['qt_par_pack'] }}" style="width:80px;"></td>
+          <td><input type="text" name="fournisseur" value="{{ c['fournisseur'] or '' }}" list="dl-composant-fourn"></td>
+          <td style="white-space:nowrap;"><button type="submit" class="icon-btn" title="Enregistrer">✓</button></td>
+          </form>
+          <td style="width:0; padding:4px 0 4px 4px;">
+            <form method="post" action="{{ url_for('composants_supprimer', composant_id=c['id']) }}">
+              <button type="submit" class="btn-danger">Suppr.</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="muted" style="padding:8px;">Aucun composant pour l'instant.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <form method="post" action="{{ url_for('composants_ajouter', snack_id=s['id']) }}" class="composant-form">
+      <input type="text" name="nom" placeholder="Composant" list="dl-composant-nom">
+      <input type="number" step="0.01" name="quantite" placeholder="Qté / unité">
+      <input type="text" name="unite" placeholder="Unité" list="dl-composant-unite">
+      <input type="number" name="qt_par_pack" placeholder="Qté / pack">
+      <input type="text" name="fournisseur" placeholder="Fournisseur" list="dl-composant-fourn">
+      <button type="submit" class="btn btn-ghost">Ajouter le composant</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<p class="muted" style="margin-bottom:1.5rem;">
+  {% if selected_competition_id %}Aucun snack choisi pour cette compétition (voir l'onglet Compétitions).{% else %}Aucun snack pour l'instant. Ajoutez le premier ci-dessous.{% endif %}
+</p>
+{% endfor %}
+
+<form method="post" action="{{ url_for('snacks_ajouter') }}" class="card" style="padding:1.25rem;">
+  <input type="hidden" name="competition_id" value="{{ selected_competition_id or '' }}">
+  <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 10px;">Ajouter un snack</p>
+  {% if selected_competition_id %}<p class="muted" style="margin:0 0 10px;">Ajouté ici, il sera automatiquement inclus dans la compétition sélectionnée avec une quantité de 1.</p>{% endif %}
+  <div class="grid-form-4">
+    <input type="text" name="nom" placeholder="Snack (ex. Sandwich jambon)" list="dl-snack" required>
+    <input type="text" name="servi" placeholder="Servi (ex. emballé)" list="dl-snack-servi">
+    <input type="number" step="0.1" name="prix_vente" placeholder="Prix de vente">
+    <input type="text" name="commentaire" placeholder="Commentaire">
+  </div>
+  <button type="submit" class="btn btn-primary" style="margin-top:12px;">Ajouter aux snacks</button>
+</form>
+
+<datalist id="dl-snack">{% for v in snack_noms %}<option value="{{ v }}">{% endfor %}</datalist>
+<datalist id="dl-snack-servi">{% for v in snack_servis %}<option value="{{ v }}">{% endfor %}</datalist>
+<datalist id="dl-composant-nom">{% for v in composant_noms %}<option value="{{ v }}">{% endfor %}</datalist>
+<datalist id="dl-composant-unite">{% for v in composant_unites %}<option value="{{ v }}">{% endfor %}</datalist>
+<datalist id="dl-composant-fourn">{% for v in composant_fournisseurs %}<option value="{{ v }}">{% endfor %}</datalist>
+{% endblock %}
