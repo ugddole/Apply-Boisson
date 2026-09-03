@@ -35,8 +35,11 @@
     </form>
     <form method="post" action="{{ url_for('snacks_supprimer', snack_id=s['id']) }}" onsubmit="return confirm('Supprimer ce snack et ses composants ?');"><button type="submit" class="btn-danger">Supprimer le snack</button></form>
   </div>
-  <div style="background:#FAF8F2; padding:14px 20px;">
-    <p style="font-size:12px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Composants de « {{ s['nom'] }} »</p>
+  <details style="background:#FAF8F2;">
+    <summary style="cursor:pointer; padding:14px 20px; font-size:12px; font-weight:600; color:#5a6b62; list-style:revert;">
+      Composants de « {{ s['nom'] }} » ({{ composants_by_snack.get(s['id'], [])|length }})
+    </summary>
+    <div style="padding:0 20px 14px;">
     <div class="table-scroll">
     <table style="margin-bottom:10px;">
       <thead><tr><th>Composant</th><th>Qté / unité vendue</th><th>Unité</th><th>Qté / pack fournisseur</th><th>Fournisseur</th><th></th></tr></thead>
@@ -71,7 +74,8 @@
       <input type="text" name="fournisseur" placeholder="Fournisseur" list="dl-composant-fourn">
       <button type="submit" class="btn btn-ghost">Ajouter le composant</button>
     </form>
-  </div>
+    </div>
+  </details>
 </div>
 {% else %}
 <p class="muted" style="margin-bottom:1.5rem;">
