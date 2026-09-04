@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="fr-font">{{ competition['nom'] }}</h1>
+<p style="margin-bottom:1.25rem;">
+  <a href="{{ url_for('commande', comp_id=competition['id']) }}">Commande boissons →</a>
+  &nbsp;·&nbsp;
+  <a href="{{ url_for('commande_snacks', comp_id=competition['id']) }}">Commande snacks →</a>
+  &nbsp;·&nbsp;
+  <a href="{{ url_for('affiche', comp_id=competition['id']) }}">Affiche boissons →</a>
+  &nbsp;·&nbsp;
+  <a href="{{ url_for('affiche_snacks', comp_id=competition['id']) }}">Affiche snacks →</a>
+</p>
+
+<form method="post" action="{{ url_for('competition_titre', comp_id=competition['id']) }}" class="card grid-titre" style="padding:1rem; margin-bottom:1.5rem;">
+  <div>
+    <label style="font-size:13px; font-weight:600; color:#5a6b62; display:block; margin-bottom:6px;">Titre de l'affiche boissons</label>
+    <input type="text" name="titre_affiche" placeholder="{{ competition['nom'] }}" value="{{ competition['titre_affiche'] or '' }}">
+  </div>
+  <div>
+    <label style="font-size:13px; font-weight:600; color:#5a6b62; display:block; margin-bottom:6px;">Titre de l'affiche snacks</label>
+    <input type="text" name="titre_affiche_snacks" placeholder="{{ competition['nom'] }}" value="{{ competition['titre_affiche_snacks'] or '' }}">
+  </div>
+  <button type="submit" class="btn btn-ghost">Enregistrer les titres</button>
+</form>
+
+<p class="muted" style="margin:-0.75rem 0 1.5rem;">Seules les quantités différentes de 0 apparaissent dans les commandes et les affiches, et pensez à enregistrer.</p>
+
+<form method="post" action="{{ url_for('competition_quantites', comp_id=competition['id']) }}">
+  <p class="fr-font" style="font-size:16px; font-weight:600; color:#14524A; background:#E8F1EE; border-left:4px solid #14524A; padding:8px 12px; margin:0 0 10px; border-radius:6px;">Boissons</p>
+  <input type="text" id="filtre-boissons" placeholder="Rechercher une boisson…" style="margin-bottom:10px;">
+  <div class="card table-scroll" style="margin-bottom:1.25rem;">
+    <table id="table-boissons">
+      <thead><tr><th>Boisson</th><th>Servi</th><th>Fournisseur</th><th style="width:140px;">Quantité prévue</th></tr></thead>
+      <tbody>
+        {% for b in boissons %}
+        <tr>
+          <td style="font-weight:500;">{{ b['nom'] }}</td>
+          <td>{{ b['servi'] or '' }}</td>
+          <td>{{ b['fournisseur'] or '' }}</td>
+          <td><input type="number" min="0" name="boisson_{{ b['id'] }}" value="{{ drink_selections.get(b['id'], '') }}" placeholder="0"></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="muted" style="text-align:center; padding:1.5rem;">Ajoutez d'abord des boissons.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="fr-font" style="font-size:16px; font-weight:600; color:#8a5a12; background:#FBF1DE; border-left:4px solid #D9A441; padding:8px 12px; margin:0 0 10px; border-radius:6px;">Snacks</p>
+  <input type="text" id="filtre-snacks" placeholder="Rechercher un snack…" style="margin-bottom:10px;">
+  <div class="card table-scroll" style="margin-bottom:1.25rem;">
+    <table id="table-snacks">
+      <thead><tr><th>Snack</th><th>Servi</th><th style="width:140px;">Quantité prévue</th></tr></thead>
+      <tbody>
+        {% for s in snacks %}
+        <tr>
+          <td style="font-weight:500;">{{ s['nom'] }}</td>
+          <td>{{ s['servi'] or '' }}</td>
+          <td><input type="number" min="0" name="snack_{{ s['id'] }}" value="{{ snack_selections.get(s['id'], '') }}" placeholder="0"></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="muted" style="text-align:center; padding:1.5rem;">Aucun snack dans la liste pour l'instant.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Enregistrer les quantités</button>
+</form>
+
+<script>
+function normalise(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function brancherFiltre(inputId, tableId) {
+  var input = document.getElementById(inputId);
+  var table = document.getElementById(tableId);
+  if (!input || !table) return;
+  input.addEventListener('input', function () {
+    var mots = normalise(input.value).split(/\s+/).filter(Boolean);
+    var lignes = table.querySelectorAll('tbody tr');
+    lignes.forEach(function (ligne) {
+      var texte = normalise(ligne.textContent);
+      var visible = mots.every(function (mot) { return texte.indexOf(mot) !== -1; });
+      ligne.style.display = visible ? '' : 'none';
+    });
+  });
+}
+brancherFiltre('filtre-boissons', 'table-boissons');
+brancherFiltre('filtre-snacks', 'table-snacks');
+</script>
+{% endblock %}
