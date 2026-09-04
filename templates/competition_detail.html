@@ -23,6 +23,8 @@
   <button type="submit" class="btn btn-ghost">Enregistrer les titres</button>
 </form>
 
+<p class="muted" style="margin:-0.75rem 0 1.5rem;">Seules les quantités différentes de 0 apparaissent dans les commandes et les affiches, et pensez à enregistrer.</p>
+
 <form method="post" action="{{ url_for('competition_quantites', comp_id=competition['id']) }}">
   <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Boissons</p>
   <input type="text" id="filtre-boissons" placeholder="Rechercher une boisson…" style="margin-bottom:10px;">
