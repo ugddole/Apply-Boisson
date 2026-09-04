@@ -25,8 +25,9 @@
 
 <form method="post" action="{{ url_for('competition_quantites', comp_id=competition['id']) }}">
   <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Boissons</p>
+  <input type="text" id="filtre-boissons" placeholder="Rechercher une boisson…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
-    <table>
+    <table id="table-boissons">
       <thead><tr><th>Boisson</th><th>Contenant</th><th>Fournisseur</th><th style="width:140px;">Quantité prévue</th></tr></thead>
       <tbody>
         {% for b in boissons %}
@@ -44,8 +45,9 @@
   </div>
 
   <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Snacks</p>
+  <input type="text" id="filtre-snacks" placeholder="Rechercher un snack…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
-    <table>
+    <table id="table-snacks">
       <thead><tr><th>Snack</th><th>Servi</th><th style="width:140px;">Quantité prévue</th></tr></thead>
       <tbody>
         {% for s in snacks %}
@@ -63,4 +65,26 @@
 
   <button type="submit" class="btn btn-primary">Enregistrer les quantités</button>
 </form>
+
+<script>
+function normalise(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function brancherFiltre(inputId, tableId) {
+  var input = document.getElementById(inputId);
+  var table = document.getElementById(tableId);
+  if (!input || !table) return;
+  input.addEventListener('input', function () {
+    var mots = normalise(input.value).split(/\s+/).filter(Boolean);
+    var lignes = table.querySelectorAll('tbody tr');
+    lignes.forEach(function (ligne) {
+      var texte = normalise(ligne.textContent);
+      var visible = mots.every(function (mot) { return texte.indexOf(mot) !== -1; });
+      ligne.style.display = visible ? '' : 'none';
+    });
+  });
+}
+brancherFiltre('filtre-boissons', 'table-boissons');
+brancherFiltre('filtre-snacks', 'table-snacks');
+</script>
 {% endblock %}
