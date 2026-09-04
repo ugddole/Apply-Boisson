@@ -28,12 +28,12 @@
   <input type="text" id="filtre-boissons" placeholder="Rechercher une boisson…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
     <table id="table-boissons">
-      <thead><tr><th>Boisson</th><th>Contenant</th><th>Fournisseur</th><th style="width:140px;">Quantité prévue</th></tr></thead>
+      <thead><tr><th>Boisson</th><th>Servi</th><th>Fournisseur</th><th style="width:140px;">Quantité prévue</th></tr></thead>
       <tbody>
         {% for b in boissons %}
         <tr>
           <td style="font-weight:500;">{{ b['nom'] }}</td>
-          <td>{{ b['contenant'] or '' }}</td>
+          <td>{{ b['servi'] or '' }}</td>
           <td>{{ b['fournisseur'] or '' }}</td>
           <td><input type="number" min="0" name="boisson_{{ b['id'] }}" value="{{ drink_selections.get(b['id'], '') }}" placeholder="0"></td>
         </tr>
