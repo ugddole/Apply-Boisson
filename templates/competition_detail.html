@@ -26,7 +26,7 @@
 <p class="muted" style="margin:-0.75rem 0 1.5rem;">Seules les quantités différentes de 0 apparaissent dans les commandes et les affiches, et pensez à enregistrer.</p>
 
 <form method="post" action="{{ url_for('competition_quantites', comp_id=competition['id']) }}">
-  <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Boissons</p>
+  <p class="fr-font" style="font-size:16px; font-weight:600; color:#14524A; background:#E8F1EE; border-left:4px solid #14524A; padding:8px 12px; margin:0 0 10px; border-radius:6px;">Boissons</p>
   <input type="text" id="filtre-boissons" placeholder="Rechercher une boisson…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
     <table id="table-boissons">
@@ -46,7 +46,7 @@
     </table>
   </div>
 
-  <p style="font-size:13px; font-weight:600; color:#5a6b62; margin:0 0 8px;">Snacks</p>
+  <p class="fr-font" style="font-size:16px; font-weight:600; color:#8a5a12; background:#FBF1DE; border-left:4px solid #D9A441; padding:8px 12px; margin:0 0 10px; border-radius:6px;">Snacks</p>
   <input type="text" id="filtre-snacks" placeholder="Rechercher un snack…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
     <table id="table-snacks">
