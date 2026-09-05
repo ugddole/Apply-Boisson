@@ -47,7 +47,8 @@ def init_db():
             qt_par_pack INTEGER DEFAULT 1,
             fournisseur TEXT,
             commentaire TEXT,
-            ordre INTEGER DEFAULT 0
+            ordre INTEGER DEFAULT 0,
+            stock INTEGER DEFAULT 0
         );
         CREATE TABLE IF NOT EXISTS snacks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,6 +106,16 @@ def init_db():
         """
     )
     db.commit()
+
+
+def migrate_db():
+    """Ajoute les colonnes qui n'existaient pas dans les bases déjà déployées."""
+    db = get_db()
+    try:
+        db.execute("ALTER TABLE boissons ADD COLUMN stock INTEGER DEFAULT 0")
+        db.commit()
+    except sqlite3.OperationalError:
+        pass  # colonne déjà présente
 
 
 def login_required(view):
@@ -294,6 +305,43 @@ def boissons_deplacer(boisson_id, direction):
     visible_ids = [r["id"] for r in visible_rows]
     move_within_view(db, "boissons", boisson_id, direction, visible_ids)
     return redirect(url_for("boissons", competition_id=comp_id) if comp_id else url_for("boissons"))
+
+
+# --------------------------------------------------------------------- Stock
+
+@app.route("/stock")
+@login_required
+def stock():
+    db = get_db()
+    rows = db.execute("SELECT * FROM boissons ORDER BY ordre, nom").fetchall()
+    return render_template("stock.html", boissons=rows)
+
+
+@app.route("/stock/maj", methods=["POST"])
+@login_required
+def stock_maj():
+    db = get_db()
+    for b in db.execute("SELECT id FROM boissons").fetchall():
+        raw = request.form.get(f"stock_{b['id']}", "").strip()
+        qte = int(raw) if raw.lstrip("-").isdigit() else 0
+        db.execute("UPDATE boissons SET stock = ? WHERE id = ?", (max(qte, 0), b["id"]))
+    db.commit()
+    flash("Stock mis à jour.", "success")
+    return redirect(url_for("stock"))
+
+
+@app.route("/boissons/<int:boisson_id>/stock", methods=["POST"])
+@login_required
+def boisson_stock_maj(boisson_id):
+    """Mise à jour du stock d'une seule boisson (utilisée si on préfère un
+    formulaire par ligne plutôt qu'un formulaire global comme /stock/maj)."""
+    raw = request.form.get("stock", "").strip()
+    qte = int(raw) if raw.lstrip("-").isdigit() else 0
+    db = get_db()
+    db.execute("UPDATE boissons SET stock = ? WHERE id = ?", (max(qte, 0), boisson_id))
+    db.commit()
+    flash("Stock mis à jour.", "success")
+    return redirect(url_for("stock"))
 
 
 # ------------------------------------------------------------------- Snacks
@@ -587,7 +635,7 @@ def commande(comp_id):
     comp = get_competition_or_404(comp_id)
     rows = db.execute(
         """
-        SELECT b.nom, b.contenant, b.qt_par_pack, b.fournisseur, s.quantite
+        SELECT b.nom, b.contenant, b.qt_par_pack, b.fournisseur, b.stock, s.quantite
         FROM selections s JOIN boissons b ON b.id = s.boisson_id
         WHERE s.competition_id = ? AND s.quantite > 0 ORDER BY b.fournisseur, b.nom
         """,
@@ -599,7 +647,8 @@ def commande(comp_id):
         pack = r["qt_par_pack"] or 1
         packs = math.ceil(r["quantite"] / pack) if pack else r["quantite"]
         par_fournisseur.setdefault(fournisseur, []).append(
-            {"nom": r["nom"], "contenant": r["contenant"], "quantite": r["quantite"], "qt_par_pack": pack, "packs": packs}
+            {"nom": r["nom"], "contenant": r["contenant"], "quantite": r["quantite"],
+             "qt_par_pack": pack, "packs": packs, "stock": r["stock"] or 0}
         )
     return render_template("commande.html", competition=comp, par_fournisseur=par_fournisseur)
 
@@ -615,7 +664,7 @@ def commande_export(comp_id):
     comp = get_competition_or_404(comp_id)
     rows = db.execute(
         """
-        SELECT b.nom, b.contenant, b.qt_par_pack, b.fournisseur, s.quantite
+        SELECT b.nom, b.contenant, b.qt_par_pack, b.fournisseur, b.stock, s.quantite
         FROM selections s JOIN boissons b ON b.id = s.boisson_id
         WHERE s.competition_id = ? AND s.quantite > 0 ORDER BY b.fournisseur, b.nom
         """,
@@ -625,7 +674,7 @@ def commande_export(comp_id):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Commande"
-    headers = ["Fournisseur", "Boisson", "Contenant", "Quantité totale", "Qté / pack", "Packs à commander"]
+    headers = ["Fournisseur", "Boisson", "Contenant", "Quantité totale", "Stock actuel", "Qté / pack", "Packs à commander"]
     ws.append(headers)
     for c in range(1, len(headers) + 1):
         cell = ws.cell(row=1, column=c)
@@ -634,8 +683,9 @@ def commande_export(comp_id):
     for r in rows:
         pack = r["qt_par_pack"] or 1
         packs = math.ceil(r["quantite"] / pack) if pack else r["quantite"]
-        ws.append([r["fournisseur"] or "Fournisseur non renseigné", r["nom"], r["contenant"] or "", r["quantite"], pack, packs])
-    for i, w in enumerate([22, 22, 18, 16, 12, 18], start=1):
+        ws.append([r["fournisseur"] or "Fournisseur non renseigné", r["nom"], r["contenant"] or "",
+                   r["quantite"], r["stock"] or 0, pack, packs])
+    for i, w in enumerate([22, 22, 18, 16, 14, 12, 18], start=1):
         ws.column_dimensions[chr(64 + i)].width = w
 
     buf = BytesIO()
@@ -811,6 +861,7 @@ def affiche_snacks_fond(comp_id):
 
 with app.app_context():
     init_db()
+    migrate_db()
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
