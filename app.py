@@ -645,10 +645,12 @@ def commande(comp_id):
     for r in rows:
         fournisseur = r["fournisseur"] or "Fournisseur non renseigné"
         pack = r["qt_par_pack"] or 1
-        packs = math.ceil(r["quantite"] / pack) if pack else r["quantite"]
+        stock = r["stock"] or 0
+        reste = max(r["quantite"] - stock, 0)
+        packs = math.ceil(reste / pack) if pack else reste
         par_fournisseur.setdefault(fournisseur, []).append(
             {"nom": r["nom"], "contenant": r["contenant"], "quantite": r["quantite"],
-             "qt_par_pack": pack, "packs": packs, "stock": r["stock"] or 0}
+             "qt_par_pack": pack, "packs": packs, "stock": stock, "reste": reste}
         )
     return render_template("commande.html", competition=comp, par_fournisseur=par_fournisseur)
 
@@ -674,7 +676,7 @@ def commande_export(comp_id):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Commande"
-    headers = ["Fournisseur", "Boisson", "Contenant", "Quantité totale", "Stock actuel", "Qté / pack", "Packs à commander"]
+    headers = ["Fournisseur", "Boisson", "Contenant", "Quantité totale", "Stock actuel", "Reste à commander", "Qté / pack", "Packs à commander"]
     ws.append(headers)
     for c in range(1, len(headers) + 1):
         cell = ws.cell(row=1, column=c)
@@ -682,10 +684,12 @@ def commande_export(comp_id):
         cell.fill = PatternFill("solid", fgColor="14524A")
     for r in rows:
         pack = r["qt_par_pack"] or 1
-        packs = math.ceil(r["quantite"] / pack) if pack else r["quantite"]
+        stock = r["stock"] or 0
+        reste = max(r["quantite"] - stock, 0)
+        packs = math.ceil(reste / pack) if pack else reste
         ws.append([r["fournisseur"] or "Fournisseur non renseigné", r["nom"], r["contenant"] or "",
-                   r["quantite"], r["stock"] or 0, pack, packs])
-    for i, w in enumerate([22, 22, 18, 16, 14, 12, 18], start=1):
+                   r["quantite"], stock, reste, pack, packs])
+    for i, w in enumerate([22, 22, 18, 16, 14, 18, 12, 18], start=1):
         ws.column_dimensions[chr(64 + i)].width = w
 
     buf = BytesIO()
