@@ -85,6 +85,7 @@
   <nav>
     <a href="{{ url_for('competitions') }}" class="{{ 'active' if request.path.startswith('/competitions') else '' }}">Compétitions</a>
     <a href="{{ url_for('boissons') }}" class="{{ 'active' if request.path.startswith('/boissons') else '' }}">Boissons</a>
+    <a href="{{ url_for('stock') }}" class="{{ 'active' if request.path.startswith('/stock') else '' }}">Stock</a>
     <a href="{{ url_for('snacks') }}" class="{{ 'active' if request.path.startswith('/snacks') or request.path.startswith('/composants') else '' }}">Snacks</a>
   </nav>
   <a class="logout" href="{{ url_for('logout') }}">Se déconnecter</a>
