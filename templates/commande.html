@@ -18,13 +18,14 @@
 <div class="card table-scroll" style="margin-bottom:1rem;">
   <div class="supplier-header">{{ fournisseur }}</div>
   <table>
-    <thead><tr><th>Boisson</th><th>Contenant</th><th>Quantité totale</th><th>Qté/pack</th><th>Packs à commander</th></tr></thead>
+    <thead><tr><th>Boisson</th><th>Contenant</th><th>Quantité totale</th><th>Stock actuel</th><th>Qté/pack</th><th>Packs à commander</th></tr></thead>
     <tbody>
       {% for l in lignes %}
       <tr>
         <td style="font-weight:500;">{{ l['nom'] }}</td>
         <td>{{ l['contenant'] or '' }}</td>
         <td>{{ l['quantite'] }}</td>
+        <td>{{ l['stock'] }}</td>
         <td>{{ l['qt_par_pack'] }}</td>
         <td style="font-weight:600;">{{ l['packs'] }}</td>
       </tr>
