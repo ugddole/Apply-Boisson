@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="no-print" style="display:flex; gap:8px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;">
+  <a href="{{ url_for('boissons') }}" class="btn-ghost">← Boissons</a>
+</div>
+
+<h1 class="fr-font">Stock</h1>
+<p class="muted">Quantité actuellement en stock pour chaque boisson. Ce stock est ensuite visible dans l'onglet Commande pour t'aider à ajuster ce qu'il reste à commander.</p>
+
+<form method="post" action="{{ url_for('stock_maj') }}">
+  <div class="card table-scroll" style="margin-bottom:1.25rem;">
+    <table>
+      <thead>
+        <tr><th>Boisson</th><th>Contenant</th><th>Fournisseur</th><th style="width:120px;">Stock actuel</th></tr>
+      </thead>
+      <tbody>
+        {% for b in boissons %}
+        <tr>
+          <td style="font-weight:500;">{{ b['nom'] }}</td>
+          <td>{{ b['contenant'] or '' }}</td>
+          <td>{{ b['fournisseur'] or '' }}</td>
+          <td>
+            <input type="number" min="0" name="stock_{{ b['id'] }}" value="{{ b['stock'] or 0 }}" style="width:90px;">
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="muted" style="text-align:center; padding:1.5rem;">
+          Aucune boisson pour l'instant. Ajoutez-en depuis l'onglet Boissons.
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if boissons %}
+  <button type="submit" class="btn btn-primary">Enregistrer le stock</button>
+  {% endif %}
+</form>
+{% endblock %}
