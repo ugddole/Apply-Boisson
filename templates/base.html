@@ -25,12 +25,14 @@
   .btn-danger { background: transparent; color: #A32D2D; border: none; font-weight: 500; padding: 4px 6px; }
   .icon-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; color: #5a6b62; font-size: 13px; }
   .card { background: white; border: 1px solid #E4E0D2; border-radius: 10px; overflow: hidden; }
-  header.topbar { background: #14524A; padding: 14px 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  header.topbar { background: #14524A; padding: 12px 2rem; display: flex; flex-direction: column; gap: 8px; }
+  .topbar-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   header.topbar .brand { color: white; font-size: 18px; font-weight: 600; }
-  header.topbar nav { display: flex; gap: 4px; flex-wrap: wrap; }
-  header.topbar nav a { color: #B9D3CC; padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; }
+  header.topbar nav { display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  header.topbar nav::-webkit-scrollbar { display: none; }
+  header.topbar nav a { color: #B9D3CC; padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
   header.topbar nav a.active { background: rgba(255,255,255,0.14); color: white; }
-  header.topbar .logout { color: #B9D3CC; font-size: 13px; }
+  header.topbar .logout { color: #B9D3CC; font-size: 13px; white-space: nowrap; }
   main { padding: 2rem 2.5rem; max-width: 1000px; margin: 0 auto; }
   .flash { padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; }
   .flash-success { background: #EAF3DE; color: #3B6D11; }
@@ -65,30 +67,79 @@
   .composant-form input { flex: 1 1 130px; min-width: 100px; }
   .row-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+  /* Barre d'outils (retour / navigation / bouton principal) au-dessus des pages détail */
+  .page-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .page-toolbar .push-right, .page-toolbar .fond-form { margin-left: auto; }
+  .fond-form { display: inline-flex; gap: 6px; align-items: center; }
+  .file-input { width: auto; }
+
+  /* Ligne d'une compétition dans la liste */
+  .comp-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #E9E5D8; flex-wrap: wrap; }
+  .comp-row-name { min-width: 0; }
+  .comp-row-name a { font-weight: 500; text-decoration: none; color: #22302C; word-break: break-word; }
+  .comp-actions { display: flex; gap: 4px 12px; align-items: center; font-size: 12px; flex-wrap: wrap; }
+  .comp-actions a { padding: 4px 2px; }
+
   @media (max-width: 720px) {
     main { padding: 1.25rem 1rem; }
     header.topbar { padding: 10px 1rem; }
-    header.topbar nav a { padding: 6px 8px; font-size: 13px; }
+    header.topbar nav a { padding: 8px 10px; font-size: 13px; }
     .grid-form-7, .grid-form-4, .grid-snack-row, .grid-titre { grid-template-columns: 1fr; }
-    .table-scroll table { min-width: 560px; }
     input[type=text], input[type=number], input[type=date], input[type=password], select {
       font-size: 16px; /* évite le zoom automatique iOS */
     }
     .toolbar, .no-print { flex-wrap: wrap; }
+
+    /* Boutons et zones cliquables plus grandes au doigt */
+    button, .btn { padding: 10px 16px; min-height: 42px; }
+    .icon-btn { padding: 9px 10px; font-size: 15px; min-height: 40px; min-width: 40px; justify-content: center; }
+    .btn-danger { padding: 9px 8px; min-height: 40px; }
+
+    .page-toolbar { gap: 6px; }
+    .page-toolbar .push-right { margin-left: 0; width: 100%; justify-content: center; order: 10; }
+    .page-toolbar .fond-form { margin-left: 0; width: 100%; order: 5; }
+    .file-input { flex: 1 1 auto; width: auto; }
+
+    .comp-row { flex-direction: column; align-items: stretch; }
+    .comp-actions { gap: 10px 14px; }
+    .comp-actions a, .comp-actions form { padding: 2px 0; }
+
+    /* Tableaux -> cartes empilées (une carte par ligne, libellé + valeur) */
+    .table-scroll { overflow-x: visible; }
+    table.responsive-cards { min-width: 0; }
+    table.responsive-cards thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    table.responsive-cards, table.responsive-cards tbody, table.responsive-cards tr, table.responsive-cards td {
+      display: block; width: 100%;
+    }
+    table.responsive-cards tr { border: 1px solid #E9E5D8; border-radius: 8px; margin-bottom: 10px; padding: 4px 12px; }
+    table.responsive-cards tr:last-child { margin-bottom: 0; }
+    table.responsive-cards td {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F0EDE2;
+    }
+    table.responsive-cards td:last-child { border-bottom: none; }
+    table.responsive-cards td[data-label]::before {
+      content: attr(data-label); flex: 0 0 40%; font-size: 11px; font-weight: 600; color: #5a6b62; text-transform: uppercase; letter-spacing: .02em;
+    }
+    table.responsive-cards td:not([data-label]) { justify-content: flex-end; }
+    table.responsive-cards td input, table.responsive-cards td select { flex: 1 1 auto; min-width: 0; }
+    table.responsive-cards td.cell-empty { display: block; text-align: center; padding: 1.25rem 0; }
+    table.responsive-cards td.cell-empty::before { content: none; }
   }
 </style>
 </head>
 <body>
 {% if session.get('authenticated') %}
 <header class="topbar no-print">
-  <div class="brand fr-font">{{ association_nom }} · Buvette</div>
+  <div class="topbar-top">
+    <div class="brand fr-font">{{ association_nom }} · Buvette</div>
+    <a class="logout" href="{{ url_for('logout') }}">Se déconnecter</a>
+  </div>
   <nav>
     <a href="{{ url_for('competitions') }}" class="{{ 'active' if request.path.startswith('/competitions') else '' }}">Compétitions</a>
     <a href="{{ url_for('boissons') }}" class="{{ 'active' if request.path.startswith('/boissons') else '' }}">Boissons</a>
     <a href="{{ url_for('stock') }}" class="{{ 'active' if request.path.startswith('/stock') else '' }}">Stock</a>
     <a href="{{ url_for('snacks') }}" class="{{ 'active' if request.path.startswith('/snacks') or request.path.startswith('/composants') else '' }}">Snacks</a>
   </nav>
-  <a class="logout" href="{{ url_for('logout') }}">Se déconnecter</a>
 </header>
 {% endif %}
 <main>

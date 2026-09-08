@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="no-print" style="display:flex; gap:8px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;">
+<div class="page-toolbar no-print">
   <a href="{{ url_for('boissons') }}" class="btn-ghost">← Boissons</a>
 </div>
 
@@ -9,22 +9,22 @@
 
 <form method="post" action="{{ url_for('stock_maj') }}">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
-    <table>
+    <table class="responsive-cards">
       <thead>
         <tr><th>Boisson</th><th>Contenant</th><th>Fournisseur</th><th style="width:120px;">Stock actuel</th></tr>
       </thead>
       <tbody>
         {% for b in boissons %}
         <tr>
-          <td style="font-weight:500;">{{ b['nom'] }}</td>
-          <td>{{ b['contenant'] or '' }}</td>
-          <td>{{ b['fournisseur'] or '' }}</td>
-          <td>
+          <td data-label="Boisson" style="font-weight:500;">{{ b['nom'] }}</td>
+          <td data-label="Contenant">{{ b['contenant'] or '' }}</td>
+          <td data-label="Fournisseur">{{ b['fournisseur'] or '' }}</td>
+          <td data-label="Stock actuel">
             <input type="number" min="0" name="stock_{{ b['id'] }}" value="{{ b['stock'] or 0 }}" style="width:90px;">
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="4" class="muted" style="text-align:center; padding:1.5rem;">
+        <tr><td colspan="4" class="muted cell-empty" style="text-align:center; padding:1.5rem;">
           Aucune boisson pour l'instant. Ajoutez-en depuis l'onglet Boissons.
         </td></tr>
         {% endfor %}

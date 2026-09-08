@@ -41,18 +41,18 @@
     </summary>
     <div style="padding:0 20px 14px;">
     <div class="table-scroll">
-    <table style="margin-bottom:10px;">
+    <table class="responsive-cards" style="margin-bottom:10px;">
       <thead><tr><th>Composant</th><th>Qté / unité vendue</th><th>Unité</th><th>Qté / pack fournisseur</th><th>Fournisseur</th><th></th></tr></thead>
       <tbody>
         {% for c in composants_by_snack.get(s['id'], []) %}
         <tr>
           <form method="post" action="{{ url_for('composants_modifier', composant_id=c['id']) }}" style="display:contents;">
-          <td><input type="text" name="nom" value="{{ c['nom'] }}" list="dl-composant-nom"></td>
-          <td><input type="number" step="0.01" name="quantite" value="{{ c['quantite'] }}" style="width:80px;"></td>
-          <td><input type="text" name="unite" value="{{ c['unite'] or '' }}" list="dl-composant-unite" style="width:90px;"></td>
-          <td><input type="number" name="qt_par_pack" value="{{ c['qt_par_pack'] }}" style="width:80px;"></td>
-          <td><input type="text" name="fournisseur" value="{{ c['fournisseur'] or '' }}" list="dl-composant-fourn"></td>
-          <td style="white-space:nowrap;"><button type="submit" class="icon-btn" title="Enregistrer">✓</button></td>
+          <td data-label="Composant"><input type="text" name="nom" value="{{ c['nom'] }}" list="dl-composant-nom"></td>
+          <td data-label="Qté / unité vendue"><input type="number" step="0.01" name="quantite" value="{{ c['quantite'] }}" style="width:80px;"></td>
+          <td data-label="Unité"><input type="text" name="unite" value="{{ c['unite'] or '' }}" list="dl-composant-unite" style="width:90px;"></td>
+          <td data-label="Qté / pack fournisseur"><input type="number" name="qt_par_pack" value="{{ c['qt_par_pack'] }}" style="width:80px;"></td>
+          <td data-label="Fournisseur"><input type="text" name="fournisseur" value="{{ c['fournisseur'] or '' }}" list="dl-composant-fourn"></td>
+          <td style="white-space:nowrap;"><button type="submit" class="icon-btn" title="Enregistrer">✓ Enregistrer</button></td>
           </form>
           <td style="width:0; padding:4px 0 4px 4px;">
             <form method="post" action="{{ url_for('composants_supprimer', composant_id=c['id']) }}">
@@ -61,7 +61,7 @@
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="6" class="muted" style="padding:8px;">Aucun composant pour l'instant.</td></tr>
+        <tr><td colspan="6" class="muted cell-empty" style="padding:8px;">Aucun composant pour l'instant.</td></tr>
         {% endfor %}
       </tbody>
     </table>

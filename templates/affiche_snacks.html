@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="no-print" style="display:flex; gap:8px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;">
+<div class="page-toolbar no-print">
   <a href="{{ url_for('competitions') }}" class="btn-ghost">← Compétitions</a>
   <a href="{{ url_for('competition_detail', comp_id=competition['id']) }}" class="btn-ghost">Quantités</a>
   <a href="{{ url_for('commande_snacks', comp_id=competition['id']) }}" class="btn-ghost">Commande snacks</a>
 
-  <form method="post" action="{{ url_for('affiche_snacks_fond', comp_id=competition['id']) }}" enctype="multipart/form-data" style="display:inline-flex; gap:6px; align-items:center; margin-left:auto;">
-    <input type="file" name="fond" accept="image/png,image/jpeg,image/webp" style="width:auto;">
+  <form method="post" action="{{ url_for('affiche_snacks_fond', comp_id=competition['id']) }}" enctype="multipart/form-data" class="fond-form" style="display:inline-flex; gap:6px; align-items:center;">
+    <input type="file" name="fond" accept="image/png,image/jpeg,image/webp" class="file-input">
     <button type="submit" class="btn btn-ghost">Changer le fond</button>
   </form>
   <button onclick="window.print()" class="btn btn-primary">Imprimer</button>

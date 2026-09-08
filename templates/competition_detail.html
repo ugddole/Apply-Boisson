@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="fr-font">{{ competition['nom'] }}</h1>
-<p style="margin-bottom:1.25rem;">
-  <a href="{{ url_for('commande', comp_id=competition['id']) }}">Commande boissons →</a>
-  &nbsp;·&nbsp;
-  <a href="{{ url_for('commande_snacks', comp_id=competition['id']) }}">Commande snacks →</a>
-  &nbsp;·&nbsp;
-  <a href="{{ url_for('affiche', comp_id=competition['id']) }}">Affiche boissons →</a>
-  &nbsp;·&nbsp;
-  <a href="{{ url_for('affiche_snacks', comp_id=competition['id']) }}">Affiche snacks →</a>
-</p>
+<div class="page-toolbar" style="margin-bottom:1.25rem;">
+  <a href="{{ url_for('commande', comp_id=competition['id']) }}" class="btn-ghost">Commande boissons →</a>
+  <a href="{{ url_for('commande_snacks', comp_id=competition['id']) }}" class="btn-ghost">Commande snacks →</a>
+  <a href="{{ url_for('affiche', comp_id=competition['id']) }}" class="btn-ghost">Affiche boissons →</a>
+  <a href="{{ url_for('affiche_snacks', comp_id=competition['id']) }}" class="btn-ghost">Affiche snacks →</a>
+</div>
 
 <form method="post" action="{{ url_for('competition_titre', comp_id=competition['id']) }}" class="card grid-titre" style="padding:1rem; margin-bottom:1.5rem;">
   <div>
@@ -29,18 +26,18 @@
   <p class="fr-font" style="font-size:16px; font-weight:600; color:#14524A; background:#E8F1EE; border-left:4px solid #14524A; padding:8px 12px; margin:0 0 10px; border-radius:6px;">Boissons</p>
   <input type="text" id="filtre-boissons" placeholder="Rechercher une boisson…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
-    <table id="table-boissons">
+    <table id="table-boissons" class="responsive-cards">
       <thead><tr><th>Boisson</th><th>Servi</th><th>Fournisseur</th><th style="width:140px;">Quantité prévue</th></tr></thead>
       <tbody>
         {% for b in boissons %}
         <tr>
-          <td style="font-weight:500;">{{ b['nom'] }}</td>
-          <td>{{ b['servi'] or '' }}</td>
-          <td>{{ b['fournisseur'] or '' }}</td>
-          <td><input type="number" min="0" name="boisson_{{ b['id'] }}" value="{{ drink_selections.get(b['id'], '') }}" placeholder="0"></td>
+          <td data-label="Boisson" style="font-weight:500;">{{ b['nom'] }}</td>
+          <td data-label="Servi">{{ b['servi'] or '' }}</td>
+          <td data-label="Fournisseur">{{ b['fournisseur'] or '' }}</td>
+          <td data-label="Quantité prévue"><input type="number" min="0" name="boisson_{{ b['id'] }}" value="{{ drink_selections.get(b['id'], '') }}" placeholder="0"></td>
         </tr>
         {% else %}
-        <tr><td colspan="4" class="muted" style="text-align:center; padding:1.5rem;">Ajoutez d'abord des boissons.</td></tr>
+        <tr><td colspan="4" class="muted cell-empty" style="text-align:center; padding:1.5rem;">Ajoutez d'abord des boissons.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -49,17 +46,17 @@
   <p class="fr-font" style="font-size:16px; font-weight:600; color:#8a5a12; background:#FBF1DE; border-left:4px solid #D9A441; padding:8px 12px; margin:0 0 10px; border-radius:6px;">Snacks</p>
   <input type="text" id="filtre-snacks" placeholder="Rechercher un snack…" style="margin-bottom:10px;">
   <div class="card table-scroll" style="margin-bottom:1.25rem;">
-    <table id="table-snacks">
+    <table id="table-snacks" class="responsive-cards">
       <thead><tr><th>Snack</th><th>Servi</th><th style="width:140px;">Quantité prévue</th></tr></thead>
       <tbody>
         {% for s in snacks %}
         <tr>
-          <td style="font-weight:500;">{{ s['nom'] }}</td>
-          <td>{{ s['servi'] or '' }}</td>
-          <td><input type="number" min="0" name="snack_{{ s['id'] }}" value="{{ snack_selections.get(s['id'], '') }}" placeholder="0"></td>
+          <td data-label="Snack" style="font-weight:500;">{{ s['nom'] }}</td>
+          <td data-label="Servi">{{ s['servi'] or '' }}</td>
+          <td data-label="Quantité prévue"><input type="number" min="0" name="snack_{{ s['id'] }}" value="{{ snack_selections.get(s['id'], '') }}" placeholder="0"></td>
         </tr>
         {% else %}
-        <tr><td colspan="3" class="muted" style="text-align:center; padding:1.5rem;">Aucun snack dans la liste pour l'instant.</td></tr>
+        <tr><td colspan="3" class="muted cell-empty" style="text-align:center; padding:1.5rem;">Aucun snack dans la liste pour l'instant.</td></tr>
         {% endfor %}
       </tbody>
     </table>
